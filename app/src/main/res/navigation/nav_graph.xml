@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/MainActivity">
+
+    <fragment
+        android:id="@+id/MainActivity"
+        android:name="com.example.attendancetracker.MainActivity"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/activity_main">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/SectionListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SectionListFragment"
+        android:name="com.example.attendancetracker.SectionListFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_section_list">
+
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/MainActivity" />
+    </fragment>
+</navigation>

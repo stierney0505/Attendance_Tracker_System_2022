@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.attendancetracker.SectionViewActivity" >
+    <item
+        android:id="@+id/importClassList"
+        android:title="@string/section_menu_importList" />
+    <item
+        android:id="@+id/addStudent"
+        android:title="@string/section_menu_addStudent" />
+</menu>
