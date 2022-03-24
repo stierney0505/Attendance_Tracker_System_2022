@@ -16,6 +16,8 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -53,6 +55,9 @@ public class SectionViewActivity extends AppCompatActivity {
             sectionName = extras.getString("sectionKey");
             semesterName = extras.getString("semesterKey");
         }
+        Button button = findViewById(R.id.QRButton);
+        button.setText("Scan QR Code");
+
         tinyDBStudentName = semesterName + "_" + sectionName + "_Names";
         tinyDBStudentEmail = semesterName + "_" + sectionName + "_Emails";
         this.setTitle(sectionName);
@@ -66,6 +71,7 @@ public class SectionViewActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.section_menu, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -90,7 +96,6 @@ public class SectionViewActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
     /*
      * Allow the user to select a CSV file from external storage
      */
@@ -245,5 +250,9 @@ public class SectionViewActivity extends AppCompatActivity {
         mDatabase.child("semesters").child(semesterName).child(sectionName).child(studentName).child("email").setValue(studentEmail);
         Log.d(TAG, "addStudentToRealtimeDB: added " + studentName + " to Realtime DB");
         Log.d(TAG, "addStudentToRealtimeDB: added " + studentEmail + " to Realtime DB");
+    }
+
+    public void QRScan(View view) {
+
     }
 }
