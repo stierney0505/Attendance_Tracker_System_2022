@@ -20,10 +20,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.opencsv.CSVReader;
 
 import java.io.File;
@@ -41,6 +44,7 @@ public class SectionViewActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE = 42;
     private String tinyDBStudentName, tinyDBStudentEmail;
     private DatabaseReference mDatabase;
+    private TextView messageText, messageFormat;
     TinyDB mTinydb;
 
     @Override
@@ -55,8 +59,14 @@ public class SectionViewActivity extends AppCompatActivity {
             sectionName = extras.getString("sectionKey");
             semesterName = extras.getString("semesterKey");
         }
+
         Button button = findViewById(R.id.QRButton);
+        messageText = findViewById(R.id.textContent);
+        messageFormat = findViewById(R.id.textFormat);
         button.setText("Scan QR Code");
+
+        button.setOnClickListener(this::QRScan);
+
 
         tinyDBStudentName = semesterName + "_" + sectionName + "_Names";
         tinyDBStudentEmail = semesterName + "_" + sectionName + "_Emails";
@@ -118,7 +128,23 @@ public class SectionViewActivity extends AppCompatActivity {
                 Toast.makeText(this, "" + path, Toast.LENGTH_SHORT).show();
             }
         }
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        // if the intentResult is null then
+        // toast a message as "cancelled"
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                // if the intentResult is not null we'll set
+                // the content and format of scan message
+                messageText.setText(intentResult.getContents());
+                messageFormat.setText(intentResult.getFormatName());
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
+
 
     //Crawl through the  and print the list
     private void readCSVandDisplay(String path) {
@@ -252,7 +278,14 @@ public class SectionViewActivity extends AppCompatActivity {
         Log.d(TAG, "addStudentToRealtimeDB: added " + studentEmail + " to Realtime DB");
     }
 
-    public void QRScan(View view) {
 
-    }
+    public void QRScan(View view){
+        IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+        intentIntegrator.setPrompt("Scan a barcode or QR Code");
+        intentIntegrator.setOrientationLocked(true);
+        intentIntegrator.initiateScan();
+    };
+
+
+
 }
