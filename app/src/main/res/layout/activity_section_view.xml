@@ -34,15 +34,18 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent" />
 
+
+
 	<Button
 		android:id="@+id/QRButton"
 		android:layout_width="200dp"
 		android:layout_height="100dp"
 		android:layout_marginEnd="104dp"
-		android:layout_marginBottom="48dp"
+		android:layout_marginBottom="29dp"
 		android:clickable="true"
 		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent" />
+		app:layout_constraintEnd_toEndOf="parent"
+		/>
 
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/studentListRecyclerView"
