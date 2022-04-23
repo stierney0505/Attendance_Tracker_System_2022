@@ -4,9 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -21,6 +24,8 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+
+import java.io.ByteArrayOutputStream;
 
 public class StudentDetailsActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
@@ -40,6 +45,7 @@ public class StudentDetailsActivity extends AppCompatActivity {
             mStudentEmail = extras.getString("email");
             this.setTitle(mStudentName);
             Bitmap myQRCode = generateQRBitmap(mStudentName, mStudentEmail);
+            sendQRCode(myQRCode);
             ImageView qrCodeView = findViewById(R.id.qrCodeView);
             qrCodeView.setImageBitmap(myQRCode);
         }
@@ -69,5 +75,32 @@ public class StudentDetailsActivity extends AppCompatActivity {
 
     private String getContents(String studentName, String studentEmail) {
         return studentName + ", " + studentEmail;
+    }
+
+    private void sendQRCode(Bitmap QRCode){
+        String recipient = mStudentEmail;
+        String subject = "Class QR Code";
+
+
+        try{
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            QRCode.compress(Bitmap.CompressFormat.PNG,100,bos);
+            String imagePath = MediaStore.Images.Media.insertImage(getContentResolver(),QRCode,"Code",null);
+            Uri uri = Uri.parse(imagePath);
+            Context context = getApplicationContext();
+
+            Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_EMAIL,new String[] {""+recipient});
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setType("image/png");
+
+            context.startActivity(intent);
+
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
