@@ -48,7 +48,7 @@ public class SectionViewActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE = 42;
     private String tinyDBStudentName, tinyDBStudentEmail;
     private DatabaseReference mDatabase;
-    private TextView messageText, messageFormat;
+
     TinyDB mTinydb;
 
     @Override
@@ -65,8 +65,7 @@ public class SectionViewActivity extends AppCompatActivity {
         }
 
         Button buttonQr = findViewById(R.id.QRButton);
-        messageText = findViewById(R.id.textContent);
-        messageFormat = findViewById(R.id.textFormat);
+
         buttonQr.setText("Scan QR Code");
 
         buttonQr.setOnClickListener(this::QRScan);
@@ -150,7 +149,7 @@ public class SectionViewActivity extends AppCompatActivity {
                 // if the intentResult is not null we'll set
                 // the content and format of scan message
                 checkIn(intentResult.getContents());
-                messageText.setText(intentResult.getContents());
+
 
 
             }
@@ -328,8 +327,7 @@ public class SectionViewActivity extends AppCompatActivity {
                     mTinydb.putListString(name, temp);
                 }
             }
-        ArrayList<String> test = mTinydb.getListString(name);
-            int temp = 0;
+
         }
     }
 
@@ -343,24 +341,20 @@ public class SectionViewActivity extends AppCompatActivity {
         }
         return fileName;
     }
-
-    public Boolean createCSV(){
-        File root = new File(Environment.getExternalStorageDirectory(), "Attendance");
-        if(!root.exists()){
-            root.mkdirs();
-        }
-        File csvFile = new File(root, "MyCSVFile.csv");
-
-
-        return false;
-    }
-
     public void ExportCSV() throws IOException {
-        File root = new File(Environment.getExternalStorageDirectory(), "Attendance");
-        if(!root.exists()) {
-            root.mkdirs();
+
+        File root = new File(Environment.getExternalStorageDirectory(), "Download");
+        String fileName = replaceSpaces("Attendance-"+ semesterName + "-" + sectionName + ".csv");
+        File csvFile = new File(root, fileName);
+
+        try{
+            if(!csvFile.exists()) {
+                csvFile.createNewFile();
+            }
         }
-        File csvFile = new File(root, "MyCSVFile.csv");
+        catch(IOException e){
+            e.printStackTrace();
+        }
 
         CSVWriter writer = null;
         try {
@@ -372,7 +366,7 @@ public class SectionViewActivity extends AppCompatActivity {
             ArrayList<String> names = mTinydb.getListString(tinyDBStudentName);
 
             for(int i = 0; i < names.size(); i++) {
-                String data[] = listToArray(mTinydb.getListString(names.get(i)));
+                String data[] = listToArray(mTinydb.getListString(names.get(i)), names.get(i));
                 writer.writeNext(data);
             }
 
@@ -387,10 +381,11 @@ public class SectionViewActivity extends AppCompatActivity {
 
     }
 
-    public String[] listToArray(ArrayList<String> list){
-        String[] temp = new String[list.size()];
-        for(int i = 0; i < list.size(); i++){
-            temp[i] = list.get(i);
+    public String[] listToArray(ArrayList<String> list, String name){
+        String[] temp = new String[list.size()+1];
+        temp[0] = name;
+        for(int i = 1; i < list.size()+1; i++){
+            temp[i] = list.get(i-1);
         }
         return temp;
     }
