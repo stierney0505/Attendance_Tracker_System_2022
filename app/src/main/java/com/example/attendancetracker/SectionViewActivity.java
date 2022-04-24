@@ -28,11 +28,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class SectionViewActivity extends AppCompatActivity {
     private static final int NAME_QUERY = 0;
@@ -44,7 +48,7 @@ public class SectionViewActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE = 42;
     private String tinyDBStudentName, tinyDBStudentEmail;
     private DatabaseReference mDatabase;
-    private TextView messageText, messageFormat;
+
     TinyDB mTinydb;
 
     @Override
@@ -60,12 +64,12 @@ public class SectionViewActivity extends AppCompatActivity {
             semesterName = extras.getString("semesterKey");
         }
 
-        Button button = findViewById(R.id.QRButton);
-        messageText = findViewById(R.id.textContent);
-        messageFormat = findViewById(R.id.textFormat);
-        button.setText("Scan QR Code");
+        Button buttonQr = findViewById(R.id.QRButton);
 
-        button.setOnClickListener(this::QRScan);
+        buttonQr.setText("Scan QR Code");
+
+        buttonQr.setOnClickListener(this::QRScan);
+
 
 
         tinyDBStudentName = semesterName + "_" + sectionName + "_Names";
@@ -84,7 +88,7 @@ public class SectionViewActivity extends AppCompatActivity {
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item){
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -100,6 +104,13 @@ public class SectionViewActivity extends AppCompatActivity {
                 return true;
             case R.id.addStudent:
                 addStudent();
+                return true;
+            case R.id.createCSV:
+                try {
+                    ExportCSV();
+                } catch (IOException e) {
+
+                }
                 return true;
         }
         //noinspection SimplifiableIfStatement
@@ -137,8 +148,10 @@ public class SectionViewActivity extends AppCompatActivity {
             } else {
                 // if the intentResult is not null we'll set
                 // the content and format of scan message
-                messageText.setText(intentResult.getContents());
-                messageFormat.setText(intentResult.getFormatName());
+                checkIn(intentResult.getContents());
+
+
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -162,7 +175,7 @@ public class SectionViewActivity extends AppCompatActivity {
             mTinydb.putListString(tinyDBStudentEmail, emailList);
             Log.d(TAG, "readCSVandDisplay: " + mTinydb.getAll());
             initClassListView(mTinydb);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -226,6 +239,7 @@ public class SectionViewActivity extends AppCompatActivity {
                     mTinydb.putListString(tinyDBStudentName, nameList);
                     mTinydb.putListString(tinyDBStudentEmail, emailList);
                     initClassListView(mTinydb);
+
                 }
                 else {
                     Log.d(TAG, "onClick: we are NOT valid");
@@ -279,13 +293,102 @@ public class SectionViewActivity extends AppCompatActivity {
     }
 
 
-    public void QRScan(View view){
+    public void QRScan(View view){ //QR SCANNING METHOD
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
         intentIntegrator.setPrompt("Scan a barcode or QR Code");
         intentIntegrator.setOrientationLocked(true);
         intentIntegrator.initiateScan();
-    };
+    }
 
+    public String seperateName(String codeValue){
+        String temp;
+        int comma = codeValue.indexOf(",");
+        if(comma == -1)
+            comma = codeValue.length()-1;
+        temp = codeValue.substring(0, comma);
+        return temp;
+    }
+
+    public void checkIn(String unfilteredName){
+        String name = seperateName(unfilteredName);
+        ArrayList<String> listNames = mTinydb.getListString(tinyDBStudentName);
+        for(int i = 0; i < listNames.size(); i++){
+            if(name.equals(listNames.get(i))){
+                if(mTinydb.getListString(name) != null){
+                     ArrayList<String> temp = mTinydb.getListString(name);
+                     Date today = new Date();
+                     temp.add(today.toString());
+                     mTinydb.putListString(name, temp);
+                }
+                else{
+                    ArrayList<String> temp = new ArrayList<>();
+                    Date today = new Date();
+                    temp.add(today.toString());
+                    mTinydb.putListString(name, temp);
+                }
+            }
+
+        }
+    }
+
+    public String replaceSpaces(String fileName) {
+        String newFileName = fileName;
+        for(int i = 0; i < fileName.length(); i++){
+            if(fileName.charAt(i) == ' '){
+                newFileName = newFileName.replaceAll("\\s+", "_");
+                return newFileName;
+            }
+        }
+        return fileName;
+    }
+    public void ExportCSV() throws IOException {
+
+        File root = new File(Environment.getExternalStorageDirectory(), "Download");
+        String fileName = replaceSpaces("Attendance-"+ semesterName + "-" + sectionName + ".csv");
+        File csvFile = new File(root, fileName);
+
+        try{
+            if(!csvFile.exists()) {
+                csvFile.createNewFile();
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+        CSVWriter writer = null;
+        try {
+            FileWriter outputfile = new FileWriter(csvFile);
+
+            writer = new CSVWriter(outputfile);
+
+
+            ArrayList<String> names = mTinydb.getListString(tinyDBStudentName);
+
+            for(int i = 0; i < names.size(); i++) {
+                String data[] = listToArray(mTinydb.getListString(names.get(i)), names.get(i));
+                writer.writeNext(data);
+            }
+
+            writer.flush();
+            writer.close();
+
+
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public String[] listToArray(ArrayList<String> list, String name){
+        String[] temp = new String[list.size()+1];
+        temp[0] = name;
+        for(int i = 1; i < list.size()+1; i++){
+            temp[i] = list.get(i-1);
+        }
+        return temp;
+    }
 
 
 }
