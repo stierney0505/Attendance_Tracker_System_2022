@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -85,6 +87,12 @@ public class SectionListActivity extends AppCompatActivity {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(sectionList, this, tinydb, semesterName);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        int nightmode = getBaseContext().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switch(nightmode){ //it seems as though the text of a recyclerview doesnt change in nightmode so this is a programmed solution
+            case Configuration.UI_MODE_NIGHT_YES:
+                recyclerView.setBackgroundColor(Color.parseColor("#6f727b"));
+        }
     }
 
     public ArrayList<String> retrieveListFromStorage(TinyDB tinydb) {

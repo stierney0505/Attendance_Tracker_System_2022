@@ -14,7 +14,6 @@
         android:layout_marginTop="25dp"
         android:text="TextView"
         android:textSize="20dp"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,5 +25,6 @@
         android:layout_marginTop="25dp"
         android:text="Clear Database"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appVersionTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/appVersionTextView"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

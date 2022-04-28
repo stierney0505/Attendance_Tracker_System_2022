@@ -1,5 +1,6 @@
 package com.example.attendancetracker;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -17,30 +19,52 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.opencsv.CSVReader;
 
 import java.io.File;
 import java.io.FileReader;
 
 public class authenticationActivity extends AppCompatActivity {
-    EditText passwordField;
+
     CharSequence invalidPassword = "Password incorrect.";
     int duration = Toast.LENGTH_SHORT;
+    private EditText emailEnter, passwordEnter;
+    private Button loginButton;
+    private Button registerButton;
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
+        mAuth = FirebaseAuth.getInstance();
+        emailEnter = findViewById(R.id.email);
+        passwordEnter = findViewById(R.id.editPasswordField);
+        loginButton = findViewById(R.id.loginBtn);
+        registerButton = findViewById(R.id.RegBtn);
 
-        // Ask the user for storage reading permissions
-        String[] requiredPermissions = { Manifest.permission.READ_EXTERNAL_STORAGE };
-        ActivityCompat.requestPermissions(this, requiredPermissions, 0);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkAuthentication();
+            }
+        });
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                register();
+            }
+        });
 
-        Button loginButton = findViewById(R.id.loginBtn);
-
-        passwordField = findViewById(R.id.editPasswordField);
-
-        passwordField.setOnKeyListener(new View.OnKeyListener() {
+        passwordEnter = findViewById(R.id.editPasswordField);
+        passwordEnter.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
@@ -55,33 +79,40 @@ public class authenticationActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+    private void register() {
+        Intent intent = new Intent(authenticationActivity.this, RegistrationActivity.class);
+        startActivity(intent);
+    }
+
+    private void checkAuthentication() {
+        String email, password;
+        password = passwordEnter.getText().toString();
+        email = emailEnter.getText().toString();
+
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            Toast.makeText(getApplicationContext(), "Enter your email and/or password", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onClick(View view) {
-                Log.d("DEBUG", "onClick: " + passwordField.getText());
-                checkAuthentication();
+            public void onComplete(
+                    @NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    initMainActivity();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(),"Invalid login information", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
-
-    public void checkAuthentication() {
-        //TODO can't be hardcoded password
-        if (passwordField.getText().toString().equals("yellow")) {
-            initMainActivity();
-        }
-        else {
-            passwordIncorrectToast();
-        }
-    }
-
 
     public void initMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
-    public void passwordIncorrectToast() {
-        Toast.makeText(authenticationActivity.this, invalidPassword, duration).show();
-    }
 }

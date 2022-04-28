@@ -10,5 +10,5 @@
         android:title="@string/section_menu_addStudent" />
     <item
         android:id="@+id/createCSV"
-        android:title="Create CSV File" />
+        android:title="Export to CSV File" />
 </menu>

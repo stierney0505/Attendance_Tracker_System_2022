@@ -16,6 +16,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.InputType;
@@ -44,11 +46,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        //Show the app version number for beta purposes
-        //TODO remove this for release
-        TextView appVer = (TextView) findViewById(R.id.appVerTextView);
-        appVer.setText("Version " + BuildConfig.VERSION_NAME);
 
         //Request external storage permission if not already allowed
         requestStoragePermission();
@@ -127,6 +124,13 @@ public class MainActivity extends AppCompatActivity {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(semesterList, this, tinydb);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        int nightmode = getBaseContext().getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switch(nightmode){ //it seems as though the text of a recyclerview doesnt change in nightmode so this is a programmed solution
+            case Configuration.UI_MODE_NIGHT_YES:
+                recyclerView.setBackgroundColor(Color.parseColor("#6f727b"));
+        }
+
     }
 
     public void openSettingsActivity(ArrayList<String> semesterList) {

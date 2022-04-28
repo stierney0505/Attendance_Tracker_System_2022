@@ -3,9 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_authentication.xml" value="0.1125" />
+        <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_authentication.xml" value="0.264" />
         <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_section_list.xml" value="0.1" />
+        <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_registration.xml" value="0.264" />
+        <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_section_list.xml" value="0.16" />
         <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_section_view.xml" value="0.176" />
         <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_settings.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/stier/StudioProjects/Attendance_Tracker_System_2022/app/src/main/res/layout/activity_student_details.xml" value="0.25416666666666665" />
