@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.attendancetracker"
-        minSdk 22
+        minSdk 30
         targetSdk 31
         versionCode 1
         versionName "0.1.5"

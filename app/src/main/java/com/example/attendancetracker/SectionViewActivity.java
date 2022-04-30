@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -327,18 +328,26 @@ public class SectionViewActivity extends AppCompatActivity {
 
     public String replaceSpaces(String fileName) {//Helper method to replace the spaces in a file name should they occur
         String newFileName = fileName;
+        char illegalChar[] = {' ', '@', ':', '#', '<', '>', '$', '+', '%', '!', '`', '&', '{', '}', '=', '|', '\\', '/', '"', '*'};
         for (int i = 0; i < fileName.length(); i++) {
-            if (fileName.charAt(i) == ' ') {
-                newFileName = newFileName.replaceAll("\\s+", "_");
-                return newFileName;
+            for (int j = 0; j < illegalChar.length; j++) {
+                if (fileName.charAt(i) == illegalChar[j]) {
+                    newFileName = newFileName.substring(0, i) + '-' + newFileName.substring(i + 1);
+                }
             }
+
         }
-        return fileName;
+        return newFileName;
     }
 
     public void ExportCSV() throws IOException { //exports the student attendace to a csv for the semester-section to the downloads folder
 
-        File root = new File(Environment.getExternalStorageDirectory(), "Download");
+        if (!Environment.isExternalStorageManager()) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            startActivity(intent);
+            return;
+        }
+        File root = new File(Environment.getExternalStorageDirectory(),"Download");
         String fileName = replaceSpaces("Attendance-" + semesterName + "-" + sectionName + ".csv");
         File csvFile = new File(root, fileName);
 
